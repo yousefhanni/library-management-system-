@@ -19,46 +19,75 @@
                     </span>
                 </div>
             </div>
-          
+
             Categories
-            </h3>
+        </h3>
         <div class="card-toolbar">
             <a asp-controller="Categories" asp-action="Create" class="btn btn-sm btn-primary">
                 <i class="bi bi-plus-square-dotted"></i>
                 Add
             </a>
-        </div>  
+        </div>
     </div>
     <div class="card-body">
-  
+
         @if (!Model.Any())
         {
             <!--begin::Alert-->
             <div class="alert alert-dismissible bg-light-danger border border-warning border-dashed d-flex flex-column flex-sm-row w-100 p-5 mb-10">
 
-                    <!--begin::Svg Icon | path: /var/www/preview.keenthemes.com/keenthemes/metronic/docs/core/html/src/media/icons/duotune/general/gen044.svg-->
+                <!--begin::Svg Icon | path: /var/www/preview.keenthemes.com/keenthemes/metronic/docs/core/html/src/media/icons/duotune/general/gen044.svg-->
                 <span class="svg-icon svg-icon-2hx svg-icon-warning me-4 mb-5 mb-sm-0">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <rect opacity="0.3" x="2" y="2" width="20" height="20" rx="10" fill="currentColor" />
-                            <rect x="11" y="14" width="7" height="2" rx="1" transform="rotate(-90 11 14)" fill="currentColor" />
-                            <rect x="11" y="17" width="2" height="2" rx="1" transform="rotate(-90 11 17)" fill="currentColor" />
-                        </svg>
-                    </span>
-                    <!--end::Svg Icon-->
-
+                        <rect opacity="0.3" x="2" y="2" width="20" height="20" rx="10" fill="currentColor" />
+                        <rect x="11" y="14" width="7" height="2" rx="1" transform="rotate(-90 11 14)" fill="currentColor" />
+                        <rect x="11" y="17" width="2" height="2" rx="1" transform="rotate(-90 11 17)" fill="currentColor" />
+                    </svg>
+                </span>
+                <!--end::Svg Icon-->
                 <!--begin::Content-->
                 <div class="d-flex flex-column pe-0 pe-sm-10 align-self-center">
                     <h5 class="mb-1">No categories found!</h5>
                 </div>
                 <!--end::Content-->
-                
+
             </div>
             <!--end::Alert-->
         }
         else
         {
-            
-        }
-    </div>
-   
-</div>
+            <div class="table-responsive">
+                <table class="table gs-7 gy-7 gx-7">
+                    <thead>
+                        <tr class="fw-semibold fs-6 text-gray-800 border-bottom border-gray-200">
+                            <th>Name</th>
+                            <th>Status</th>
+                            <th>Created On</th>
+                            <th>Last Updated On</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var category in Model)
+                        {
+                            <tr>
+                                <td>@category.Name</td>
+                                <td>
+                                    <span class="badge badge-light-@(category.IsDeleted ? "danger" : "success")">
+                                        @(category.IsDeleted ? "Deleted" : "Available")
+                                    </span>
+
+                                </td>
+                                <td>@category.CreatedOn</td>
+                                <td>@category.LastUpdatedOn</td>
+                                <td>
+                                    <a class="btn btn-sm btn-outline btn-outline-dashed btn-outline-primary btn-active-light-primary" asp-controller="Categories" asp-action="Edit" asp-route-id="@category.Id">
+                                        <i class="fas fa-edit"></i> Edit
+                                      </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+         }
