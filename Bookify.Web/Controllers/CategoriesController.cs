@@ -1,21 +1,24 @@
 ﻿using Bookify.Web.Core.Models;
 using Bookify.Web.Core.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Xml.Linq;
 namespace Bookify.Web.Controllers
 {
-	public class CategoriesController : Controller
-	{
-		private readonly ApplicationDbContext _dbContext;
+    public class CategoriesController : Controller
+    {
+        private readonly ApplicationDbContext _dbContext;
 
-		public CategoriesController(ApplicationDbContext dbContext)
-		{
-			_dbContext = dbContext;
-		}
+        public CategoriesController(ApplicationDbContext dbContext)
+        {
+            _dbContext = dbContext;
+        }
 
         public IActionResult Index()
         {
-            var categories = _dbContext.Categories.ToList();
+            //TODO: use ViewModel 
+            //AsNoTracking => To preserve performance
+            var categories = _dbContext.Categories.AsNoTracking().ToList();
             return View(categories);
         }
 
@@ -27,15 +30,15 @@ namespace Bookify.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(CreateEditCategoryViewModel model) 
-        {   
+        public IActionResult Create(CreateEditCategoryViewModel model)
+        {
             if (!ModelState.IsValid)//Server side validation
                 return View(model);
 
-             var category = new Category { Name = model.Name };//Manual Mapping
+            var category = new Category { Name = model.Name };//Manual Mapping
             _dbContext.Add(category);
-             _dbContext.SaveChanges();    
-            
+            _dbContext.SaveChanges();
+
             return RedirectToAction(nameof(Index));
         }
 
@@ -46,7 +49,7 @@ namespace Bookify.Web.Controllers
             if (category == null)
                 return NotFound();
 
-             var viewModel=new CreateEditCategoryViewModel //Manual Mapping
+            var viewModel = new CreateEditCategoryViewModel //Manual Mapping
             {
                 Id = id,
                 Name = category.Name
@@ -59,19 +62,37 @@ namespace Bookify.Web.Controllers
         public IActionResult Edit(CreateEditCategoryViewModel model)
         {
             if (!ModelState.IsValid)//Server side validation
-                return View("CreateEdit",model);
+                return View("CreateEdit", model);
 
             var category = _dbContext.Categories.Find(model.Id);
-             if (category == null)
+            if (category == null)
                 return NotFound();
- 
-             category.Name = model.Name;
-             category.LastUpdatedOn = DateTime.Now;
+
+            category.Name = model.Name;
+            category.LastUpdatedOn = DateTime.Now;
 
             _dbContext.Update(category);
             _dbContext.SaveChanges();
 
             return RedirectToAction(nameof(Index));
         }
-    }   
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult ToggleStatus(int id)
+        {
+            var category = _dbContext.Categories.Find(id);
+
+            if (category is null)
+                return NotFound();
+
+            // Toggle the IsDeleted property of the category (switch between true and false)
+            category.IsDeleted = !category.IsDeleted; //Switch
+            category.LastUpdatedOn = DateTime.Now; 
+
+            _dbContext.SaveChanges();
+             
+            return Ok(category.LastUpdatedOn.ToString());
+        }
+    }
 }

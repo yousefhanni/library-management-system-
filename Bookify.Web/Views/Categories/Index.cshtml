@@ -1,4 +1,5 @@
 ﻿@model IEnumerable<Category>
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery antiforgery
 
 @{
     ViewData["Title"] = "Categories";
@@ -73,21 +74,78 @@
                             <tr>
                                 <td>@category.Name</td>
                                 <td>
-                                    <span class="badge badge-light-@(category.IsDeleted ? "danger" : "success")">
+                                    <span class="badge badge-light-@(category.IsDeleted ? "danger" : "success") js-status">
                                         @(category.IsDeleted ? "Deleted" : "Available")
                                     </span>
 
                                 </td>
                                 <td>@category.CreatedOn</td>
-                                <td>@category.LastUpdatedOn</td>
+                                <td class="js-updated-on">@category.LastUpdatedOn</td>
                                 <td>
-                                    <a class="btn btn-sm btn-outline btn-outline-dashed btn-outline-primary btn-active-light-primary" asp-controller="Categories" asp-action="Edit" asp-route-id="@category.Id">
-                                        <i class="fas fa-edit"></i> Edit
-                                      </a>
+                                    <button type="button" class="btn btn-sm btn-icon btn-color-primary btn-active-light-primary" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">
+                                        <!--begin::Svg Icon | path: icons/duotune/general/gen024.svg-->
+                                        <span class="svg-icon svg-icon-2">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" viewBox="0 0 24 24">
+                                                <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                                                    <rect x="5" y="5" width="5" height="5" rx="1" fill="currentColor"></rect>
+                                                    <rect x="14" y="5" width="5" height="5" rx="1" fill="currentColor" opacity="0.3"></rect>
+                                                    <rect x="5" y="14" width="5" height="5" rx="1" fill="currentColor" opacity="0.3"></rect>
+                                                    <rect x="14" y="14" width="5" height="5" rx="1" fill="currentColor" opacity="0.3"></rect>
+                                                </g>
+                                            </svg>
+                                        </span>
+                                        <!--end::Svg Icon-->
+                                    </button>
+                                    <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-800 menu-state-bg-light-primary fw-semibold w-200px py-3" data-kt-menu="true" style="">
+                                        <!--begin::Menu item-->
+                                        <div class="menu-item px-3">
+                                            <a asp-controller="Categories" asp-action="Edit" asp-route-id="@category.Id" class="menu-item px-3 "> Edit</a>
+                                        </div>
+                                        <!--end::Menu item-->
+                                        <!--begin::Menu item-->
+                                        <div class="menu-item px-3">
+                                            <a href="javascript:;" class="menu-link flex-stack px-3 js-toggle-status" data-id="@category.Id">
+                                                Toggle Status
+                                            </a>
+                                        </div>
+                                        <!--end::Menu item-->
+                                    </div>
                                 </td>
                             </tr>
                         }
                     </tbody>
                 </table>
             </div>
-         }
+        }
+    </div>
+</div>
+
+<input type="hidden" name="__RequestVerificationToken" value="@antiforgery.GetAndStoreTokens(Context).RequestToken" />
+
+@section Scripts
+{
+    <script>
+        $(document).ready(function () {
+            $('.js-toggle-status').on('click', function () {
+                var btn = $(this); // The clicked button
+                // Retrieve the data-id(categoryId) attribute value
+                var categoryId = btn.data('id');
+                // Make an HTTP request to toggle the status
+                $.ajax({
+                    url: '/Categories/ToggleStatus/' + categoryId, // Assuming the URL of your ToggleStatus action
+                    data:{
+                        '__RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+                    },
+                    method: 'POST', // depending on your server-side implementation
+                    success: function (response) {
+                        // Handle the success response here
+                        var status = btn.parents('tr').find('.js-status');
+                        var newStatus = status.text().trim() === 'Deleted' ? 'Available' : 'Deleted';
+                        status.text(newStatus).toggleClass('badge-light-success badge-light-danger');
+                        btn.parents('tr').find('.js-updated-on').html(response);
+                    }
+                });
+            });
+        });
+    </script>
+}
