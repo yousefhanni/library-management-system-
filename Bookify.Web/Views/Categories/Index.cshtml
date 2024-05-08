@@ -128,24 +128,60 @@
         $(document).ready(function () {
             $('.js-toggle-status').on('click', function () {
                 var btn = $(this); // The clicked button
-                // Retrieve the data-id(categoryId) attribute value
-                var categoryId = btn.data('id');
-                // Make an HTTP request to toggle the status
-                $.ajax({
-                    url: '/Categories/ToggleStatus/' + categoryId, // Assuming the URL of your ToggleStatus action
-                    data:{
-                        '__RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+
+                // Use Package (client-side library named bootbox.js)
+                bootbox.confirm({
+                    message: 'Are you sure that need to toggle this item status?', // Fixed the missing quote
+                    buttons: {
+                        confirm: {
+                            label: 'Yes',
+                            className: 'btn-danger'
+                        },
+                        cancel: {
+                            label: 'No',
+                            className: 'btn-secondary'
+                        }
                     },
-                    method: 'POST', // depending on your server-side implementation
-                    success: function (response) {
-                        // Handle the success response here
-                        var status = btn.parents('tr').find('.js-status');
-                        var newStatus = status.text().trim() === 'Deleted' ? 'Available' : 'Deleted';
-                        status.text(newStatus).toggleClass('badge-light-success badge-light-danger');
-                        btn.parents('tr').find('.js-updated-on').html(response);
+                    callback: function (result) {
+                       //if (result).This checks if the value of result is true, indicating that the user clicked 'Yes'.
+                        if (result) {
+                     //.data('id'): This jQuery method retrieves the value of the (data-id) attribute associated with the HTML element btn
+                            var categoryId = btn.data('id');
+                       ///Make request is sent asynchronously to the server to perform the actual status toggle operation without reloading the entire page.
+                       ///The AJAX request handled by a server-side controller or endpoint responsible for processing the status toggle operation
+                            $.ajax({
+                                url: '/Categories/ToggleStatus/' + categoryId, // Assuming the URL of your ToggleStatus action
+                                data: {
+                                    '__RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+                                },
+                                method: 'POST', // depending on your server-side implementation
+
+                             //the UI(View) is updated based on the response from the server,providing visual feedback to the user and confirming the successful completion of the status toggle operation
+                                success: function (lastUpdatedOn) {
+                                    // Handle the success response here
+                                    var row = btn.parents('tr');
+                                    var status = row.find('.js-status');
+                                    var newStatus = status.text().trim() === 'Deleted' ? 'Available' : 'Deleted';
+                                    status.text(newStatus).toggleClass('badge-light-success badge-light-danger');
+                                    row.find('.js-updated-on').html(lastUpdatedOn);
+                                    row.addClass('animate__animated animate__flash');
+                                    //Call showSuccessMessage Function that exist inside site.js that execute sweetalert(Saved Successfully!) with Dynamic way and Clean Code
+                                    showSuccessMessage();
+                                },
+                               error: function () {
+                                    //Call showErrorMessage Function that exist inside site.js that execute sweetalert(Something went wrong!) with Dynamic way and Clean Code
+                                   showErrorMessage();
+                               }
+                            });
+                        }
                     }
                 });
+
+                // Confirmation Box native of JS
+                // var result = confirm('Are you sure that need to toggle this item status?');
+
             });
         });
+
     </script>
 }
