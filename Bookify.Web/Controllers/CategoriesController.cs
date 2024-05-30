@@ -1,8 +1,9 @@
 ﻿using Bookify.Web.Core.Models;
 using Bookify.Web.Core.ViewModels;
+using Bookify.Web.Filters;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Xml.Linq;
+
 namespace Bookify.Web.Controllers
 {
     public class CategoriesController : Controller
@@ -20,30 +21,32 @@ namespace Bookify.Web.Controllers
             //AsNoTracking => To preserve performance
             var categories = _dbContext.Categories.AsNoTracking().ToList();
             return View(categories);
-        }
+        }   
 
         [HttpGet]
+        [AjaxOnly]
         public IActionResult Create()
         {
-            return View("CreateEdit");
+            return PartialView("_CreateEditForm");
         }
+
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Create(CreateEditCategoryViewModel model)
         {
             if (!ModelState.IsValid)//Server side validation
-                return View(model);
+                return BadRequest(); //
 
             var category = new Category { Name = model.Name };//Manual Mapping
             _dbContext.Add(category);
             _dbContext.SaveChanges();
 
-            TempData["Message"] = "Saved Successfully";
-            return RedirectToAction(nameof(Index));
+            return PartialView("_CategoryRow", category);
         }
 
         [HttpGet]
+        [AjaxOnly]
         public IActionResult Edit(int id)
         {
             var category = _dbContext.Categories.Find(id);
@@ -55,15 +58,15 @@ namespace Bookify.Web.Controllers
                 Id = id,
                 Name = category.Name
             };
-            return View("CreateEdit", viewModel);
+            return PartialView("_CreateEditForm", viewModel);
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
 
         public IActionResult Edit(CreateEditCategoryViewModel model)
         {
-            if (!ModelState.IsValid)//Server side validation
-                return View("CreateEdit", model);
+            if (!ModelState.IsValid)
+                return BadRequest();
 
             var category = _dbContext.Categories.Find(model.Id);
             if (category == null)
@@ -72,12 +75,9 @@ namespace Bookify.Web.Controllers
             category.Name = model.Name;
             category.LastUpdatedOn = DateTime.Now;
 
-            _dbContext.Update(category);
             _dbContext.SaveChanges();
 
-            TempData["Message"] = "Saved Successfully";
-
-            return RedirectToAction(nameof(Index));
+            return PartialView("_CategoryRow", category);
         }
 
         [HttpPost]

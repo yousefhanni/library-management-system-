@@ -1,43 +1,50 @@
 ﻿@model IEnumerable<Category>
 @inject Microsoft.AspNetCore.Antiforgery.IAntiforgery antiforgery
-
 @{
     ViewData["Title"] = "Categories";
-
 }
 
+<!-- Begin Card Component -->
 <div class="card shadow-sm">
+    <!-- Card Header -->
     <div class="card-header">
+        <!-- Card Title -->
         <h3 class="card-title">
+            <!-- Symbol Icon -->
             <div class="symbol symbol-40px me-4">
                 <div class="symbol-label fs-2 fw-semibold text-success">
-                    <!--begin::Svg Icon | path: icons/duotune/general/gen002.svg-->
+                    <!-- SVG Icon -->
                     <span class="svg-icon svg-icon-2x svg-icon-primary">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path opacity="0.3" d="M21.25 18.525L13.05 21.825C12.35 22.125 11.65 22.125 10.95 21.825L2.75 18.525C1.75 18.125 1.75 16.725 2.75 16.325L4.04999 15.825L10.25 18.325C10.85 18.525 11.45 18.625 12.05 18.625C12.65 18.625 13.25 18.525 13.85 18.325L20.05 15.825L21.35 16.325C22.35 16.725 22.35 18.125 21.25 18.525ZM13.05 16.425L21.25 13.125C22.25 12.725 22.25 11.325 21.25 10.925L13.05 7.62502C12.35 7.32502 11.65 7.32502 10.95 7.62502L2.75 10.925C1.75 11.325 1.75 12.725 2.75 13.125L10.95 16.425C11.65 16.725 12.45 16.725 13.05 16.425Z" fill="currentColor" />
                             <path d="M11.05 11.025L2.84998 7.725C1.84998 7.325 1.84998 5.925 2.84998 5.525L11.05 2.225C11.75 1.925 12.45 1.925 13.15 2.225L21.35 5.525C22.35 5.925 22.35 7.325 21.35 7.725L13.05 11.025C12.45 11.325 11.65 11.325 11.05 11.025Z" fill="currentColor" />
                         </svg>
                     </span>
+                    <!-- End SVG Icon -->
                 </div>
             </div>
-
+            <!-- End Symbol Icon -->
             Categories
         </h3>
+        <!-- Card Toolbar -->
         <div class="card-toolbar">
-            <a asp-controller="Categories" asp-action="Create" class="btn btn-sm btn-primary">
+            <!-- Add Button -->
+            <a href="javascript:;" class="btn btn-sm btn-primary js-render-modal"
+               data-title="Add Categories" data-url="/Categories/Create">
                 <i class="bi bi-plus-square-dotted"></i>
                 Add
             </a>
         </div>
     </div>
+    <!-- End Card Header -->
+    <!-- Card Body -->
     <div class="card-body">
-
+        <!-- Check if there are any categories -->
         @if (!Model.Any())
         {
-            <!--begin::Alert-->
+            <!-- Alert if no categories found -->
             <div class="alert alert-dismissible bg-light-danger border border-warning border-dashed d-flex flex-column flex-sm-row w-100 p-5 mb-10">
-
-                <!--begin::Svg Icon | path: /var/www/preview.keenthemes.com/keenthemes/metronic/docs/core/html/src/media/icons/duotune/general/gen044.svg-->
+                <!-- SVG Icon for alert -->
                 <span class="svg-icon svg-icon-2hx svg-icon-warning me-4 mb-5 mb-sm-0">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <rect opacity="0.3" x="2" y="2" width="20" height="20" rx="10" fill="currentColor" />
@@ -45,18 +52,17 @@
                         <rect x="11" y="17" width="2" height="2" rx="1" transform="rotate(-90 11 17)" fill="currentColor" />
                     </svg>
                 </span>
-                <!--end::Svg Icon-->
-                <!--begin::Content-->
+                <!-- End SVG Icon -->
+                <!-- Alert Content -->
                 <div class="d-flex flex-column pe-0 pe-sm-10 align-self-center">
                     <h5 class="mb-1">No categories found!</h5>
                 </div>
-                <!--end::Content-->
-
+                <!-- End Alert Content -->
             </div>
-            <!--end::Alert-->
         }
         else
         {
+            <!-- Table of Categories -->
             <div class="table-responsive">
                 <table class="table gs-7 gy-7 gx-7">
                     <thead>
@@ -71,47 +77,7 @@
                     <tbody>
                         @foreach (var category in Model)
                         {
-                            <tr>
-                                <td>@category.Name</td>
-                                <td>
-                                    <span class="badge badge-light-@(category.IsDeleted ? "danger" : "success") js-status">
-                                        @(category.IsDeleted ? "Deleted" : "Available")
-                                    </span>
-
-                                </td>
-                                <td>@category.CreatedOn</td>
-                                <td class="js-updated-on">@category.LastUpdatedOn</td>
-                                <td>
-                                    <button type="button" class="btn btn-sm btn-icon btn-color-primary btn-active-light-primary" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">
-                                        <!--begin::Svg Icon | path: icons/duotune/general/gen024.svg-->
-                                        <span class="svg-icon svg-icon-2">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" viewBox="0 0 24 24">
-                                                <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-                                                    <rect x="5" y="5" width="5" height="5" rx="1" fill="currentColor"></rect>
-                                                    <rect x="14" y="5" width="5" height="5" rx="1" fill="currentColor" opacity="0.3"></rect>
-                                                    <rect x="5" y="14" width="5" height="5" rx="1" fill="currentColor" opacity="0.3"></rect>
-                                                    <rect x="14" y="14" width="5" height="5" rx="1" fill="currentColor" opacity="0.3"></rect>
-                                                </g>
-                                            </svg>
-                                        </span>
-                                        <!--end::Svg Icon-->
-                                    </button>
-                                    <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-800 menu-state-bg-light-primary fw-semibold w-200px py-3" data-kt-menu="true" style="">
-                                        <!--begin::Menu item-->
-                                        <div class="menu-item px-3">
-                                            <a asp-controller="Categories" asp-action="Edit" asp-route-id="@category.Id" class="menu-item px-3 "> Edit</a>
-                                        </div>
-                                        <!--end::Menu item-->
-                                        <!--begin::Menu item-->
-                                        <div class="menu-item px-3">
-                                            <a href="javascript:;" class="menu-link flex-stack px-3 js-toggle-status" data-id="@category.Id">
-                                                Toggle Status
-                                            </a>
-                                        </div>
-                                        <!--end::Menu item-->
-                                    </div>
-                                </td>
-                            </tr>
+                            <partial name="_CategoryRow" model="@category" />
                         }
                     </tbody>
                 </table>
@@ -119,17 +85,22 @@
         }
     </div>
 </div>
+<!-- End Card Component -->
 
+<!-- Anti-forgery token -->
 <input type="hidden" name="__RequestVerificationToken" value="@antiforgery.GetAndStoreTokens(Context).RequestToken" />
 
 @section Scripts
 {
+    @* Include partial scripts for client-side validation *@
+    <partial name="_ValidationScriptsPartial" />
     <script>
         $(document).ready(function () {
-            $('.js-toggle-status').on('click', function () {
+            // Handle Toggle Status button click
+            $('body').delegate('.js-toggle-status', 'click', function () {
                 var btn = $(this); // The clicked button
 
-                // Use Package (client-side library named bootbox.js)
+                // Use bootbox.js for confirmation dialog
                 bootbox.confirm({
                     message: 'Are you sure that need to toggle this item status?', // Fixed the missing quote
                     buttons: {
@@ -143,20 +114,20 @@
                         }
                     },
                     callback: function (result) {
-                       //if (result).This checks if the value of result is true, indicating that the user clicked 'Yes'.
-                        if (result) {
-                     //.data('id'): This jQuery method retrieves the value of the (data-id) attribute associated with the HTML element btn
+                        // If user confirms                     
+                          if (result) {
+                            // .data('id'): This jQuery method retrieves the value of the 'data-id' attribute from the btn element.
                             var categoryId = btn.data('id');
-                       ///Make request is sent asynchronously to the server to perform the actual status toggle operation without reloading the entire page.
-                       ///The AJAX request handled by a server-side controller or endpoint responsible for processing the status toggle operation
+                            // Make request to the server to toggle the status without reloading the page.
+                            // The AJAX request is handled by a server-side controller or endpoint.
                             $.ajax({
-                                url: '/Categories/ToggleStatus/' + categoryId, // Assuming the URL of your ToggleStatus action
+                                url: '/Categories/ToggleStatus/' + categoryId, // URL of ToggleStatus action
                                 data: {
                                     '__RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
                                 },
                                 method: 'POST', // depending on your server-side implementation
 
-                             //the UI(View) is updated based on the response from the server,providing visual feedback to the user and confirming the successful completion of the status toggle operation
+                                // Update the UI based on the server response, providing visual feedback to confirm the status toggle.
                                 success: function (lastUpdatedOn) {
                                     // Handle the success response here
                                     var row = btn.parents('tr');
@@ -165,21 +136,17 @@
                                     status.text(newStatus).toggleClass('badge-light-success badge-light-danger');
                                     row.find('.js-updated-on').html(lastUpdatedOn);
                                     row.addClass('animate__animated animate__flash');
-                                    //Call showSuccessMessage Function that exist inside site.js that execute sweetalert(Saved Successfully!) with Dynamic way and Clean Code
+                                    // Call showSuccessMessage from site.js to display a "Saved Successfully!" alert dynamically.
                                     showSuccessMessage();
                                 },
                                error: function () {
-                                    //Call showErrorMessage Function that exist inside site.js that execute sweetalert(Something went wrong!) with Dynamic way and Clean Code
-                                   showErrorMessage();
+                                    // Call showErrorMessage from site.js to display a "Something went wrong!" alert dynamically.
+                                    showErrorMessage();
                                }
                             });
                         }
                     }
                 });
-
-                // Confirmation Box native of JS
-                // var result = confirm('Are you sure that need to toggle this item status?');
-
             });
         });
 

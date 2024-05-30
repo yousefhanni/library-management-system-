@@ -1,0 +1,28 @@
+﻿@model CreateEditCategoryViewModel
+
+<!-- Form for creating or editing a category, dynamically setting the action to "Create" or "Edit" based on the presence of an ID in the model.
+     The form uses AJAX for asynchronous submission via the POST method, calling `showSuccessMessage` on success and `showErrorMessage` on failure. -->
+<form asp-action="@(Model?.Id > 0 ? "Edit" : "Create")"
+      data-ajax-method="post"  
+      data-ajax="true"
+      data-ajax-success="onModalSuccess"
+      data-ajax-failure="showErrorMessage">
+    <!-- Render a hidden input field for the category ID if it's an edit operation -->
+    @if (Model?.Id > 0)
+    {
+        ///It tells ASP.NET Core to bind the value of this input field to the Id property of the (ViewModel) when the form is submitted.
+        ///the primary purpose of the hidden input field is to pass data from the client to the server(pass to ViewModel through (asp-for) and viewmodel will pass Data to Edit endpoint)
+        <input type="hidden" asp-for="Id" />
+    }
+    <div class="mb-5">
+        <div class="form-floating mb-2">
+            <!-- Input field for the category name -->
+            <input type="text" class="form-control" placeholder="Name" asp-for="Name">
+            <label asp-for="Name"></label>
+        </div>
+        <!-- Validation message for the category name -->
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+    <!-- Button to submit the form -->
+    <partial name="_ModalFooter" />
+</form>

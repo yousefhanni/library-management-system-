@@ -22,21 +22,16 @@ body {
 .bootbox .modal-dialog {
     position: relative;
 }
-.modal-header{
-    
-    margin: -21px;
 
-}
-
-.bootbox .modal-dialog .bootbox-close-button {
-    position: absolute !important;
-    top: 10px !important; /* Adjust as needed */
-    right: 10px !important; /* Adjust as needed */
-    padding: 0.5rem 0.75rem !important;
-    z-index: 1 !important;
-    background-color: transparent !important;
-    border: 0 !important;
-    -webkit-appearance: none !important;
+.bootbox-close-button {
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 0.5rem 0.75rem;
+    z-index: 1;
+    background-color: transparent;
+    border: 0;
+    -webkit-appearance: none;
 }
 
 /* End Override Bootbox */
