@@ -1,4 +1,4 @@
-﻿@model IEnumerable<Category>
+﻿@model IEnumerable<CategoryViewModel>
 @inject Microsoft.AspNetCore.Antiforgery.IAntiforgery antiforgery
 
 @{
@@ -126,60 +126,4 @@
 {
     @* Include partial scripts for client-side validation *@
     <partial name="_ValidationScriptsPartial" />
-    <script>
-        $(document).ready(function () {
-            // Handle Toggle Status button click
-            $('body').delegate('.js-toggle-status', 'click', function () {
-                var btn = $(this); // The clicked button
-                // Use bootbox.js for confirmation dialog
-                bootbox.confirm({
-                    message: 'Are you sure that need to toggle this item status?', // Fixed the missing quote
-                    buttons: {
-                        confirm: {
-                            label: 'Yes',
-                            className: 'btn-danger'
-                        },
-                        cancel: {
-                            label: 'No',
-                            className: 'btn-secondary'
-                        }
-                    },
-                    callback: function (result) {
-                        // If user confirms
-                        if (result) {
-                            // .data('id'): This jQuery method retrieves the value of the 'data-id' attribute from the btn element.
-                            var categoryId = btn.data('id');
-                            // Make request to the server to toggle the status without reloading the page.
-                            // The AJAX request is handled by a server-side controller or endpoint.
-                            $.ajax({
-                                url: '/Categories/ToggleStatus/' + categoryId, // URL of ToggleStatus action
-                                data: {
-                                    '__RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
-                                },
-                                method: 'POST', // depending on your server-side implementation
-
-                                // Update the UI based on the server response, providing visual feedback to confirm the status toggle.
-                                success: function (lastUpdatedOn) {
-                                    // Handle the success response here
-                                    var row = btn.parents('tr');
-                                    var status = row.find('.js-status');
-                                    var newStatus = status.text().trim() === 'Deleted' ? 'Available' : 'Deleted';
-                                    status.text(newStatus).toggleClass('badge-light-success badge-light-danger');
-                                    row.find('.js-updated-on').html(lastUpdatedOn);
-                                    row.addClass('animate__animated animate__flash');
-                                    // Call showSuccessMessage from site.js to display a "Saved Successfully!" alert dynamically.
-                                    showSuccessMessage();
-                                },
-                                error: function () {
-                                    // Call showErrorMessage from site.js to display a "Something went wrong!" alert dynamically.
-                                    showErrorMessage();
-                                }
-                            });
-                        }
-                    }
-                });
-            });
-        });
-
-    </script>
 }

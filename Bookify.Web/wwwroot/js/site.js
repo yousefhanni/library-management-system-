@@ -26,6 +26,9 @@ function showErrorMessage(message = 'Something went wrong!') {
         }
     });
 }
+function onModalBegin() {
+    $('body :submit').attr('disabled', 'disabled').attr('data-kt-indicator', 'on');
+}
 
 function onModalSuccess(row) {
     // Function to handle the success of modal operations
@@ -44,6 +47,10 @@ function onModalSuccess(row) {
     KTMenu.init(); // Reinitialize KTMenu
     KTMenu.initHandlers(); // Reinitialize KTMenu handlers
 }
+function onModalComplete() {
+    $('body :submit').removeAttr('disabled').removeAttr('data-kt-indicator');
+}
+
 
 // Initialize the array of column indices to be exported
 var headers = $('th');
@@ -59,7 +66,6 @@ var KTDatatables = function () {
         // Initialize the datatable
         datatable = $(table).DataTable({
             "info": false, // Disable info display
-            'order': [], // Disable initial ordering
             'pageLength': 10, // Set default page length
         });
     }
@@ -162,7 +168,6 @@ $(document).ready(function () {
         if (btn.data('update') !== undefined) {
             // If updating, set updatedRow to the parent row of the button
             updatedRow = btn.parents('tr');
-            console.log(updatedRow); // Log the updated row
         }
 
         // Load the form into the modal
@@ -177,5 +182,54 @@ $(document).ready(function () {
             }
         });
         modal.modal('show'); // Show the modal
+    });
+    // Handle Toggle Status button click
+    $('body').delegate('.js-toggle-status', 'click', function () {
+        var btn = $(this); // The clicked button
+        // Use bootbox.js for confirmation dialog
+        bootbox.confirm({
+            message: 'Are you sure that need to toggle this item status?', // Fixed the missing quote
+            buttons: {
+                confirm: {
+                    label: 'Yes',
+                    className: 'btn-danger'
+                },
+                cancel: {
+                    label: 'No',
+                    className: 'btn-secondary'
+                }
+            },
+            callback: function (result) {
+                // If user confirms
+                if (result) {
+                    // Make request to the server to toggle the status without reloading the page.
+                    // The AJAX request is handled by a server-side controller or endpoint.
+                    $.ajax({
+                        url: btn.data('url'), // URL of ToggleStatus action
+                        data: {
+                            '__RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+                        },
+                        method: 'POST', // depending on your server-side implementation
+
+                        // Update the UI based on the server response, providing visual feedback to confirm the status toggle.
+                        success: function (lastUpdatedOn) {
+                            // Handle the success response here
+                            var row = btn.parents('tr');
+                            var status = row.find('.js-status');
+                            var newStatus = status.text().trim() === 'Deleted' ? 'Available' : 'Deleted';
+                            status.text(newStatus).toggleClass('badge-light-success badge-light-danger');
+                            row.find('.js-updated-on').html(lastUpdatedOn);
+                            row.addClass('animate__animated animate__flash');
+                            // Call showSuccessMessage from site.js to display a "Saved Successfully!" alert dynamically.
+                            showSuccessMessage();
+                        },
+                        error: function () {
+                            // Call showErrorMessage from site.js to display a "Something went wrong!" alert dynamically.
+                            showErrorMessage();
+                        }
+                    });
+                }
+            }
+        });
     });
 });
