@@ -1,8 +1,8 @@
-﻿@model IEnumerable<CategoryViewModel>
+﻿@model IEnumerable<AuthorViewModel>
 @inject Microsoft.AspNetCore.Antiforgery.IAntiforgery antiforgery
 
 @{
-    ViewData["Title"] = "Categories";
+    ViewData["Title"] = "Authors";
 }
 
 <!-- Styles section for DataTables -->
@@ -26,12 +26,12 @@
         </div>
         <!-- Alert content -->
         <div class="d-flex flex-column pe-0 pe-sm-10">
-            <h5 class="mb-1">Categories</h5>
+            <h5 class="mb-1">Authors</h5>
         </div>
     </div>
-    <!-- Add Category button -->
+    <!-- Add Author button -->
     <div>
-        <a href="javascript:;" class="btn btn-sm btn-primary js-render-modal" data-title="Add Category" data-url="/Categories/Create">
+        <a href="javascript:;" class="btn btn-sm btn-primary js-render-modal" data-title="Add Author" data-url="/Authors/Create">
             <i class="bi bi-plus-square-dotted"></i>
             Add
         </a>
@@ -46,7 +46,7 @@
         <!-- Table container for Categories with responsive design -->
         <div class="table-responsive">
             <!-- DataTable initialization with custom document title for the table -->
-            <table class="table table-row-dashed table-row-gray-300 gy-7 js-datatables" data-document-title="Categories">
+            <table class="table table-row-dashed table-row-gray-300 gy-7 js-datatables" data-document-title="Authors">
                 <thead>
                     <tr class="fw-semibold fs-6 text-gray-800 border-bottom border-gray-200">
                         <!-- Table headers for Categories -->
@@ -59,10 +59,10 @@
                 </thead>
                 <tbody>
                     <!-- Iterating through the Model to populate table rows dynamically -->
-                    @foreach (var category in Model)
+                    @foreach (var Author in Model)
                     {
-                        <!-- Rendering a partial view for each category row -->
-                        <partial name="_CategoryRow" model="@category" />
+                        <!-- Rendering a partial view for each Author row -->
+                        <partial name="_AuthorRow" model="@Author" />
                     }
                 </tbody>
             </table>

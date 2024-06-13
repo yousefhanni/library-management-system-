@@ -3,7 +3,7 @@
     public class CategoriesController : Controller
     {
         private readonly ApplicationDbContext _dbContext;
-       private readonly IMapper _mapper;
+        private readonly IMapper _mapper;
         public CategoriesController(ApplicationDbContext dbContext, IMapper mapper)
         {
             _dbContext = dbContext;
@@ -17,7 +17,7 @@
             var viewModel = _mapper.Map<IEnumerable<CategoryViewModel>>(categories);
 
             return View(viewModel);
-        }   
+        }
 
         [HttpGet]
         [AjaxOnly]
@@ -29,7 +29,7 @@
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(CreateEditCategoryViewModel model)
+        public IActionResult Create(CategoryFormViewModel model)
         {
             if (!ModelState.IsValid)//Server side validation
                 return BadRequest(); //
@@ -51,14 +51,14 @@
             if (category == null)
                 return NotFound();
 
-            var viewModel = _mapper.Map<CreateEditCategoryViewModel>(category); 
-          
+            var viewModel = _mapper.Map<CategoryFormViewModel>(category);
+
             return PartialView("_CreateEditForm", viewModel);
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
 
-        public IActionResult Edit(CreateEditCategoryViewModel model)
+        public IActionResult Edit(CategoryFormViewModel model)
         {
             if (!ModelState.IsValid)
                 return BadRequest();
@@ -88,15 +88,15 @@
 
             // Toggle the IsDeleted property of the category (switch between true and false)
             category.IsDeleted = !category.IsDeleted; //Switch
-            category.LastUpdatedOn = DateTime.Now; 
+            category.LastUpdatedOn = DateTime.Now;
 
             _dbContext.SaveChanges();
-             
+
             return Ok(category.LastUpdatedOn.ToString());
         }
 
 
-        public IActionResult AllowItem(CreateEditCategoryViewModel model)
+        public IActionResult AllowItem(CategoryFormViewModel model)
         {
             // Retrieve the category from the database that matches the name provided in the model
             var category = _dbContext.Categories.SingleOrDefault(c => c.Name == model.Name);
