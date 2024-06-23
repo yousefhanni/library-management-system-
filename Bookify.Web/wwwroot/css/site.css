@@ -22,6 +22,11 @@ body {
 .bootbox .modal-dialog {
     position: relative;
 }
+/* Start Override theme */
+.form-floating > .form-select {
+    padding-bottom: 0.225rem;
+}
+/* End Override theme */
 
 .bootbox-close-button {
     position: absolute;
