@@ -30,6 +30,12 @@
     <!-- Card Body -->
     <div class="card-body ">
         <form method="post" asp-controller="Books" enctype="multipart/form-data">
+            @if (Model.Id > 0)
+            {
+                ///It tells ASP.NET Core to bind the value of this input field to the Id property of the (ViewModel) when the form is submitted.
+                ///the primary purpose of the hidden input field is to pass data from the client to the server(pass to ViewModel through (asp-for) and viewmodel will pass Data to Edit endpoint)
+                <input type="hidden" asp-for="Id" />
+            }
             <div class="row">
                 <div class="col-md-4">
                     <div class="mb-5">
@@ -92,8 +98,12 @@
                     <div class="row">
                         <div class="col-md-4">
                             <div class="mb-5">
+                                <div>
+                                    <img id="ImagePreview" src="~/images/books/@(Model.ImageUrl is null ? "no-book.jpg" : Model.ImageUrl)" class="img-thumbnail" alt="Book Image">
+                                </div>
                                 <div class="form-floating mb-2">
-                                    <input type="file" class="form-control" placeholder="Image" asp-for="Image" />
+                                    <input type="file" class="form-control" placeholder="Image" asp-for="Image" accept=".jpg,.jpeg,.png"
+                                           onchange="document.getElementById('ImagePreview').src = window.URL.createObjectURL(this.files[0])" />
                                     <label asp-for="Image"></label>
                                 </div>
                                 <span asp-validation-for="Image" class="text-danger d-block"></span>

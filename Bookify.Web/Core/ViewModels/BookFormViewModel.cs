@@ -28,6 +28,8 @@ namespace Bookify.Web.Core.ViewModels
         // Image file for the book.
         public IFormFile? Image { get; set; }
 
+        public string? ImageUrl { get; set; }
+
         // Hall location of the book within the library or bookstore 
         [MaxLength(50, ErrorMessage = "The maximum length for the hall is 50 characters.")]
         public string Hall { get; set; } = null!;
