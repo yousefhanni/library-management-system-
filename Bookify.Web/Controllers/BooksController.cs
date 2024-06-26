@@ -4,7 +4,8 @@ namespace Bookify.Web.Controllers
 {
     public class BooksController : Controller
     {
-        private  readonly IWebHostEnvironment _webHostEnvironment;
+        // This is useful for accessing the web root path(wwwroot) where the images will be saved.
+        private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly ApplicationDbContext _context;
         private readonly IMapper _mapper;
 
@@ -200,5 +201,21 @@ namespace Bookify.Web.Controllers
             // Return the populated view model
             return viewModel;
         }
+
+        // This endpoint checks if a book title is unique for a given author,
+        // allowing the creation or updating of a book record without duplication.
+        public IActionResult AllowItem(BookFormViewModel model)
+        {
+            // Retrieve a book from the database that has the same title and author ID as the model
+            var book = _context.Books.SingleOrDefault(b => b.Title == model.Title && b.AuthorId == model.AuthorId);
+
+            // Determine if the book is allowed:
+            var isAllowed = book is null || book.Id.Equals(model.Id);
+
+            // Return the result as a JSON response
+            return Json(isAllowed);
+        }
+
+
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using UoN.ExpressiveAnnotations.NetCore.Attributes;
 
 namespace Bookify.Web.Core.ViewModels
 {
@@ -7,6 +8,8 @@ namespace Bookify.Web.Core.ViewModels
         public int Id { get; set; }
 
         [MaxLength(500, ErrorMessage = "The maximum length for the title is 500 characters.")]
+        [Remote("AllowItem", null!, AdditionalFields = "Id,AuthorId", ErrorMessage = Errors.Duplicated)]
+
         public string Title { get; set; } = null!;
 
         // ID of the selected author.
@@ -22,7 +25,7 @@ namespace Bookify.Web.Core.ViewModels
 
         // Publishing date of the book.
         [Display(Name = "Publishing Date")]
-        [DataType(DataType.Date)]
+        [AssertThat("PublishingDate <= Today()", ErrorMessage = Errors.NotAllowFutureDates)]
         public DateTime PublishingDate { get; set; }=DateTime.Now;
 
         // Image file for the book.

@@ -1,6 +1,7 @@
 using Bookify.Web.Core.Mapping;
 using Microsoft.AspNetCore.Identity;
 using System.Reflection;
+using UoN.ExpressiveAnnotations.NetCore.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,6 +18,7 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages().AddRazorRuntimeCompilation();
 //Registration of mapping profile
 builder.Services.AddAutoMapper(Assembly.GetAssembly(typeof(MappingProfile)));
+builder.Services.AddExpressiveAnnotations();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
