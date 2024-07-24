@@ -1,4 +1,5 @@
-﻿@model BookFormViewModel
+﻿
+@model BookFormViewModel
 
 @{
     ViewData["Title"] = "Book Form";
@@ -37,7 +38,7 @@
                 <input type="hidden" asp-for="Id" />
             }
             <!--begin::Image input-->
-            <div class="image-input image-input-empty mb-10" data-kt-image-input="true" style="background-image: url(/images/@(string.IsNullOrEmpty(Model.ImageUrl) ? "image-placeholder.jpg" : $"/books/{Model.ImageUrl}"))">
+            <div class="image-input image-input-empty mb-10" data-kt-image-input="true" style="background-image: url(@(string.IsNullOrEmpty(Model.ImageUrl) ? "/images/image-placeholder.jpg" : Model.ImageUrl))">
                 <!--begin::Image preview wrapper-->
                 <div class="image-input-wrapper w-125px h-200px"></div>
                 <!--end::Image preview wrapper-->
@@ -161,16 +162,16 @@
                 </div>
             </div>
 
-                            <div>
-                                <button type="submit" class="btn btn-primary btn-sm">
-                                    <span class="indicator-label">
-                                        Save
-                                    </span>
-                                    <span class="indicator-progress">
-                                        Please wait... <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
-                                    </span>
-                                </button>
-                            </div>
+            <div>
+                <button type="submit" class="btn btn-primary btn-sm">
+                    <span class="indicator-label">
+                        Save
+                    </span>
+                    <span class="indicator-progress">
+                        Please wait... <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
+                    </span>
+                </button>
+            </div>
 
         </form>
     </div>

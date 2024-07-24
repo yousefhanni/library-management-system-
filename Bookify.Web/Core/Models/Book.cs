@@ -21,6 +21,9 @@
 
         public string? ImageUrl { get; set; }
 
+        public string? ImageThumbnailUrl { get; set; }
+        public string? ImagePublicId { get; set; }
+
         // Location of the book within the library or bookstore 
         [MaxLength(50)]
         public string Hall { get; set; } = null!;

@@ -18,6 +18,9 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages().AddRazorRuntimeCompilation();
 //Registration of mapping profile
 builder.Services.AddAutoMapper(Assembly.GetAssembly(typeof(MappingProfile)));
+//Registers the CloudinarySettings class with the dependency injection container
+//and binds it to the "CloudinarySettings" section in the configuration(appsettings.json).
+builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection(nameof(CloudinarySettings)));
 builder.Services.AddExpressiveAnnotations();
 var app = builder.Build();
 

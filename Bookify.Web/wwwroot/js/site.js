@@ -148,13 +148,12 @@ var KTDatatables = function () {
 
 $(document).ready(function () {
 
-    //Select2
+    //Select2 : jQuery plugin(method)
     //Enhance standard select elements with advanced features like searching, tagging, and styling.
     $('.js-select2').select2();
 
     //Datepicker 
     // Initialize a date picker that allows users to select a single date within a specified range.
-    $('.js-datepicker').daterangepicker({
     $('.js-datepicker').daterangepicker({
         singleDatePicker: true,  // Only allow selecting a single date
         autoApply: true,         // Automatically apply the selection without needing to press a button
