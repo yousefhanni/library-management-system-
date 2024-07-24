@@ -14,14 +14,17 @@ namespace Bookify.Web.Controllers
         //private field To access on Cloudinary service 
         private readonly Cloudinary _cloudinary;
 
-        /// Rule: When dealing with any file inside the application, ensure two things:
+        #region Rules dealing with any file inside the application
+
+        ///When dealing with any file inside the application, ensure two things:
         /// 1. Allowed Extensions: 
         ///    - Only accept specified extensions.
         ///    - Not accepting any type of extension prevents hacking risks.
         ///    - Example: A hacker might send a script or an executable file to hack the system.
         /// 2. File Size:
         ///    - Ensure the file size is within acceptable limits.
-        ///    - This prevents excessive storage usage and potential attacks.
+        ///    - This prevents excessive storage usage and potential attacks. 
+        #endregion
 
         private List<string> _allowedExtensions = new() { ".jpg", ".jpeg", ".png" };
         private int _maxAllowedSize = 2097152;
@@ -87,32 +90,41 @@ namespace Bookify.Web.Controllers
                 var imageName = $"{Guid.NewGuid()}{extension}"; // Generate a unique image name using GUID and extension
 
                 //Save image on Server 
-                //var path = Path.Combine($"{_webHostEnvironment.WebRootPath}/images/books", imageName);
+                var path = Path.Combine($"{_webHostEnvironment.WebRootPath}/images/books", imageName);
+                var thumbPath = Path.Combine($"{_webHostEnvironment.WebRootPath}/images/books/thumbn", imageName);
 
-                //using var stream = System.IO.File.Create(path);
-                //await model.Image.CopyToAsync(stream);
-                //book.ImageUrl = imageName;
+                using var stream = System.IO.File.Create(path);
+                await model.Image.CopyToAsync(stream);
+                stream.Dispose();
+
+                book.ImageUrl = $"/images/books/{imageName}";
+                book.ImageThumbnailUrl = $"/images/books/thumbn/{imageName}";
+
+                //Create Thumbnail of images inside Local Server
+                using var image = Image.Load(model.Image.OpenReadStream());
+                var ratio = (float)image.Width / 200;
+                var height = image.Height / ratio;
+                image.Mutate(i => i.Resize(width: 200, height: (int)height));
+                image.Save(thumbPath);
 
 
                 //To Save image on Cloudinary => 
 
-                // Open the image file stream for reading
-                using var stream = model.Image.OpenReadStream();
+                //using var stream = model.Image.OpenReadStream();
 
-                // Define parameters for the image upload, including file description and usage of the filename
-                var imageParams = new ImageUploadParams()
-                {
-                    File = new FileDescription(imageName, stream),
+                //// Define parameters for the image upload, including file description and usage of the filename
+                //var imageParams = new ImageUploadParams()
+                //{
+                //    File = new FileDescription(imageName, stream),
 
-                    // Specify that the uploaded file should use the same name (GUID) as provided
-                    UseFilename = true
-                };
+                //    // Specify that the uploaded file should use the same name (GUID) as provided
+                //    UseFilename = true
+                //};
 
-                var result = await _cloudinary.UploadAsync(imageParams);
-
-                book.ImageUrl = result.SecureUrl.ToString();  // receive Url from cloudinary then Add to ImageUrl of Book
-                book.ImageThumbnailUrl = GetThumbnailUrl(book.ImageUrl);   
-                book.ImagePublicId = result.PublicId;
+                //var result = await _cloudinary.UploadAsync(imageParams);
+                //book.ImageUrl = result.SecureUrl.ToString();  // receive Url from cloudinary then Add to ImageUrl of Book
+                //book.ImageThumbnailUrl = GetThumbnailUrl(book.ImageUrl);   
+                //book.ImagePublicId = result.PublicId;
                 
             }
 
@@ -157,22 +169,31 @@ namespace Bookify.Web.Controllers
 
             if (book == null)
                 return NotFound();
-            string imagePublicId = null;
+
             // Check if a new image is uploaded
             if (model.Image != null)
             {
                 // If the book already has an image, delete the old image file
                 if (!string.IsNullOrEmpty(book.ImageUrl))
                 {
-                    //Apply delete on server
-                    //var oldImagePath = Path.Combine($"{_webHostEnvironment.WebRootPath}/images/books", book.ImageUrl);
+                    // Construct the full path for the old image
+                    var oldImagePath = Path.Combine($"{_webHostEnvironment.WebRootPath}", book.ImageUrl.TrimStart('/'));
 
-                    //if (System.IO.File.Exists(oldImagePath))
-                    //    System.IO.File.Delete(oldImagePath);
+                    if (System.IO.File.Exists(oldImagePath))
+                    {
+                        System.IO.File.Delete(oldImagePath);
+                    }
 
-                    //Apply delete on Cloudinary
-                    await _cloudinary.DeleteResourcesAsync(book.ImagePublicId);
+                    // Construct the full path for the old thumbnail image
+                    var oldThumbnailPath = Path.Combine($"{_webHostEnvironment.WebRootPath}", book.ImageThumbnailUrl.TrimStart('/'));
 
+                    if (System.IO.File.Exists(oldThumbnailPath))
+                    {
+                        System.IO.File.Delete(oldThumbnailPath);
+                    }
+
+                    // Apply delete on Cloudinary
+                    // await _cloudinary.DeleteResourcesAsync(book.ImagePublicId);
                 }
 
                 // Validate the image file extension
@@ -193,48 +214,54 @@ namespace Bookify.Web.Controllers
 
                 var imageName = $"{Guid.NewGuid()}{extension}";
 
+                // Save new image on local server
+                var path = Path.Combine($"{_webHostEnvironment.WebRootPath}/images/books", imageName);
+                var thumbPath = Path.Combine($"{_webHostEnvironment.WebRootPath}/images/books/thumbn", imageName);
 
-                //Edit image on Server 
-                //var path = Path.Combine($"{_webHostEnvironment.WebRootPath}/images/books", imageName);
-
-                //using var stream = System.IO.File.Create(path);
-                //await model.Image.CopyToAsync(stream);
-
-                //model.ImageUrl = imageName;
-
-
-                //Edit image on Cloudinary
-                using var straem = model.Image.OpenReadStream();
-
-                var imageParams = new ImageUploadParams
+                using (var stream = System.IO.File.Create(path))
                 {
-                    File = new FileDescription(imageName, straem),
-                    UseFilename = true
-                };
+                    await model.Image.CopyToAsync(stream);
+                }
 
-                var result = await _cloudinary.UploadAsync(imageParams);
+                model.ImageUrl = $"/images/books/{imageName}";
+                model.ImageThumbnailUrl = $"/images/books/thumbn/{imageName}";
 
-                model.ImageUrl = result.SecureUrl.ToString();
-                imagePublicId = result.PublicId;
+                using (var image = Image.Load(model.Image.OpenReadStream()))
+                {
+                    var ratio = (float)image.Width / 200;
+                    var height = image.Height / ratio;
+                    image.Mutate(i => i.Resize(width: 200, height: (int)height));
+                    image.Save(thumbPath);
+                }
+
+                // Save new image on Cloudinary
+                // using var stream = model.Image.OpenReadStream();
+                // var imageParams = new ImageUploadParams
+                // {
+                //     File = new FileDescription(imageName, stream),
+                //     UseFilename = true
+                // };
+                // var result = await _cloudinary.UploadAsync(imageParams);
+                // model.ImageUrl = result.SecureUrl.ToString();
+                // book.ImagePublicId = result.PublicId;
             }
-            // If no new image is uploaded and the book already has an image, retain the old image URL
             else if (!string.IsNullOrEmpty(book.ImageUrl))
+            {
                 model.ImageUrl = book.ImageUrl;
+                model.ImageThumbnailUrl = book.ImageThumbnailUrl;
+            }
 
             book = _mapper.Map(model, book);
             book.LastUpdatedOn = DateTime.Now;
-            book.ImageThumbnailUrl = GetThumbnailUrl(book.ImageUrl!);
-            book.ImagePublicId = imagePublicId;
-                
+
             foreach (var categoryId in model.SelectedCategories)
                 book.Categories.Add(new BookCategory { CategoryId = categoryId });
 
-            // Save the changes to the database asynchronously
             await _context.SaveChangesAsync();
 
-            // Redirect to the Index action
             return RedirectToAction(nameof(Index));
         }
+
 
         // Method to populate the BookFormViewModel with data
         private BookFormViewModel PopulateViewModel(BookFormViewModel? model = null)
@@ -259,7 +286,7 @@ namespace Bookify.Web.Controllers
         // This endpoint checks if a book title is unique for a given author,
         // allowing the creation or updating of a book record without duplication.
         public IActionResult AllowItem(BookFormViewModel model)
-        {
+        {   
             // Retrieve a book from the database that has the same title and author ID as the model
             var book = _context.Books.SingleOrDefault(b => b.Title == model.Title && b.AuthorId == model.AuthorId);
 

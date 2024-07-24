@@ -26,8 +26,12 @@ function showErrorMessage(message = 'Something went wrong!') {
         }
     });
 }
-function onModalBegin() {
+function disableSubmitButton() {
     $('body :submit').attr('disabled', 'disabled').attr('data-kt-indicator', 'on');
+}
+
+function onModalBegin() {
+    disableSubmitButton();
 }
 
 function onModalSuccess(row) {
@@ -147,10 +151,25 @@ var KTDatatables = function () {
 }();
 
 $(document).ready(function () {
+    // Disable submit button and show loading animation upon form submission
+    $('form').on('submit', function () {
+        if ($('.js-tinymce').length > 0) {
+            $('.js-tinymce').each(function () { 
+                var input = $(this);
+                var content = tinyMCE.get(input.attr('id')).getContent();
+                input.val(content);
+            });
+        }
+        var isValid = $(this).valid();
+        if (isValid) disableSubmitButton();
+    });
 
     //Select2 : jQuery plugin(method)
     //Enhance standard select elements with advanced features like searching, tagging, and styling.
     $('.js-select2').select2();
+    $('.js-select2').on('select2:select', function (e) {
+        $('form').validate().element('#' + $(this).attr('id'));
+    });
 
     //Datepicker 
     // Initialize a date picker that allows users to select a single date within a specified range.
@@ -163,15 +182,16 @@ $(document).ready(function () {
 
     //TinyMCE
     // Configuration options for TinyMCE editor
-    var options = { selector: ".js-tinymce", height: "422" };
+    if ($('.js-tinymce').length > 0) {
+        var options = { selector: ".js-tinymce", height: "430" };
 
-    // Check if the current theme mode is 'dark'
-    if (KTThemeMode.getMode() === "dark") {
-        options["skin"] = "oxide-dark";       // Use the dark skin for TinyMCE
-        options["content_css"] = "dark";      // Apply dark content CSS for TinyMCE
+        if (KTThemeMode.getMode() === "dark") {
+            options["skin"] = "oxide-dark";
+            options["content_css"] = "dark";
+        }
+
+        tinymce.init(options);
     }
-    // Initialize TinyMCE with the specified options
-    tinymce.init(options);
 
 
     // Display success message if present
